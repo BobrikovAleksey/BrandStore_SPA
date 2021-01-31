@@ -2,8 +2,8 @@ const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 const handler = require('./handler');
-const catalogUrl = '../database/catalog.json';
-const cartUrl = '../database/cart-user.json';
+const catalogUrl = './database/catalog.json';
+const cartUrl = './database/cart-user.json';
 
 
 /**

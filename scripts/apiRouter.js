@@ -2,23 +2,23 @@ const fs = require('fs');
 const express = require('express');
 const router = express.Router();
 
-const catalogUrl = '../database/catalog.json';
-const reviewUrl = '../database/review.json';
-const regionsUrl = '../database/regions.json';
-const citiesUrl = '../database/cities.json';
+const catalogUrl = './database/catalog.json';
+const reviewUrl = './database/review.json';
+const regionsUrl = './database/regions.json';
+const citiesUrl = './database/cities.json';
 
 
 /**
  * Преобразует строку в объект
  *
- * @param JsonString - преобразуемая строка
+ * @param jsonString - преобразуемая строка
  * @returns {null|*} возвращает объект или "null"
  */
-const parser = (JsonString) => {
+const parser = (jsonString) => {
   let result = null;
 
   try {
-    result = JSON.parse(JsonString);
+    result = JSON.parse(jsonString);
   } catch (err) {
     return result;
   }
@@ -63,10 +63,9 @@ const filterCatalog = (query, data) => {
  */
 router.get('/catalog', (req, res) => {
   fs.readFile(catalogUrl, 'utf-8', (err, data) => {
-    if (err) {
-      res.sendStatus(404, JSON.stringify({result: 0, text: err}));
+    if (err) res.sendStatus(404, JSON.stringify({result: 0, text: err}));
 
-    } else {
+    else {
       const params = {};
 
       if ('categories' in req.query) params.categories = parser(req.query.categories);
