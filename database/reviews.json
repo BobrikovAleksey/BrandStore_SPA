@@ -1,5 +1,5 @@
-[
-  {
+{
+  "1": {
     "id": 1,
     "message": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, ea, quasi.",
     "user": {
@@ -10,7 +10,8 @@
       "city": "Москва"
     }
   },
-  {
+
+  "2": {
     "id": 2,
     "message": "Accusantium amet atque commodi consequatur delectus doloremque ea eos est et facilis illo illum in incidunt laborum laudantium minima, nam nemo, odit possimus quaerat quidem ratione sapiente vitae voluptatem voluptatum!",
     "user": {
@@ -21,7 +22,8 @@
       "city": "Санкт-Петербург"
     }
   },
-  {
+
+  "3": {
     "id": 3,
     "message": "Animi asperiores at aut consequatur cum cumque ea earum eos esse excepturi explicabo facilis fugiat in iusto magnam magni maxime modi necessitatibus obcaecati quam quos recusandae repellendus repudiandae, soluta vel velit veritatis, voluptas voluptates?",
     "user": {
@@ -32,4 +34,4 @@
       "city": "Москва"
     }
   }
-]
+}
