@@ -18,18 +18,18 @@ const CLEAR = 'cart.clear';
  */
 router.get('/', (request, response) => {
   if (!db.catalog) {
-    response.sendStatus(404).send('{"result": -1, "message": "Try again request later"}');
+    response.sendStatus(404, '{"result": -1, "message": "Try again request later"}');
     return;
   }
 
   if (db.catalog.result === 0) {
-    response.sendStatus(404).send(JSON.stringify(db.catalog));
+    response.sendStatus(404, JSON.stringify(db.catalog));
     return;
   }
 
   fs.readFile(cartUrl, 'utf-8', (err, data) => {
     if (err) {
-      response.sendStatus(404).send(JSON.stringify({ result: 0, message: err }));
+      response.sendStatus(404, JSON.stringify({ result: 0, message: err }));
       return;
     }
 

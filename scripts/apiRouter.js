@@ -31,7 +31,7 @@ const _getCatalogParams = ({ page, collection, categories, brands, colors, filte
   if (brands) params.brands = lib.jsonParse(brands.toLowerCase()) ?? [];
   if (colors) params.colors = lib.jsonParse(colors.toLowerCase()) ?? [];
   if (filter) params.filter = lib.jsonParse(filter.toLowerCase()) ?? [];
-  if (sortBy) params.sortBy = lib.jsonParse(sortBy.toLowerCase()) ?? [];
+  if (sortBy) params.sortBy = lib.jsonParse(sortBy.toLowerCase()) ?? {};
   if (quantity) params.quantity = Number(quantity);
 
   return params;
@@ -55,17 +55,18 @@ const _filterCatalog = (data, { page, collection, brands, categories, colors, fi
   return data.filter((el) => {
     if (page && el.page !== page) return false;
     if (collection && el.collection !== collection) return false;
-    if (categories && !categories.includes(`${el.type} | ${el.category}`)) return false;
-    if (brands && !brands.includes(el.brands)) return false;
-    if (colors && !colors.includes(el.colors)) return false;
+    if (categories && !categories.includes(`${el.type}|${el.category}`)) return false;
+    if (brands && !brands.includes(el.brand)) return false;
+    if (colors && !colors.includes(el.color.title) && !colors.includes(el.color.value)) return false;
 
     if (filter) {
       const strEl = JSON.stringify(el);
 
       for (let i = 0; i < filter.length; i++) {
-          const regexp = new RegExp(filter[i], 'i');
-          if (!regexp.test(strEl)) return false;
-        }
+        if (filter[i].length < 3) continue;
+
+        if (!(new RegExp(filter[i], 'i')).test(strEl)) return false;
+      }
     }
 
     return true;
@@ -127,9 +128,9 @@ const _respondWithError = (tableName, response) => {
   if (!db[tableName]) body = `{"result": -1, "message": "Table \"${tableName}]\": Try again request later"}`;
   else if (db[tableName].result === 0) body = JSON.stringify(db[tableName]);
 
-  if (body) response.sendStatus(404).send(body);
+  if (body) response.sendStatus(404, body);
 
-  return !body;
+  return Boolean(body);
 }
 
 
@@ -146,9 +147,9 @@ router.get('/catalog', (request, response) => {
   tmpData.forEach((el) => data.push(db.catalog.data[`${el.id}`]));
 
   if (params.sortBy) {
-    const fields = Object.keys(params.sortBy).reverse();
+    const fields = Object.keys(params.sortBy);
 
-    for (let i = fields.length - 1; i <= 0; i--) {
+    for (let i = fields.length - 1; i >= 0; i--) {
       switch (params.sortBy[fields[i]]) {
         default:
           data.sort((a, b) => _compareItemsAsc(a, b, fields[i]));
@@ -234,7 +235,7 @@ router.get('/product', (request, response) => {
   if (!db.catalog.data[id]) body = `{result: 1, text: "Product ID:${id} is not at the catalog"}`;
 
   if (body) {
-    response.sendStatus(404).send(body);
+    response.sendStatus(404, body);
     return;
   }
 
@@ -243,6 +244,16 @@ router.get('/product', (request, response) => {
   links.forEach((el) => result.push(db.catalog.data[String(el)]));
 
   response.send(JSON.stringify(result));
+});
+
+
+/**
+ * Возвращает список отзывов
+ */
+router.get('/reviews', (request, response) => {
+  if (_respondWithError(REVIEWS, response)) return;
+
+  response.send(db.reviews.list);
 });
 
 
@@ -263,16 +274,6 @@ router.get('/lists/regions', (request, response) => {
   if (_respondWithError(REGIONS, response)) return;
 
   response.send(db.regions.list);
-});
-
-
-/**
- * Возвращает список отзывов
- */
-router.get('/review', (request, response) => {
-  if (_respondWithError(REVIEWS, response)) return;
-
-  response.send(db.reviews.list);
 });
 
 

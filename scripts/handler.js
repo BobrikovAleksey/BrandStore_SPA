@@ -21,7 +21,7 @@ const actions = {
  */
 const handler = (request, response, action, filepath) => {
   if (!actions[action]) {
-    response.sendStatus(404).send(JSON.stringify({
+    response.sendStatus(404, JSON.stringify({
       result: 0,
       message: `Handler [${action}]: There is not such action`,
     }));
@@ -30,7 +30,7 @@ const handler = (request, response, action, filepath) => {
 
   fs.readFile(filepath, 'utf-8', (err, data) => {
     if (err) {
-      response.sendStatus(404).send(JSON.stringify({result: 0, message: err}));
+      response.sendStatus(404, JSON.stringify({result: 0, message: err}));
       return;
     }
 
