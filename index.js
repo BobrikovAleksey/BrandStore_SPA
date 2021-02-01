@@ -1,10 +1,8 @@
-const fs = require('fs');
 const express = require('express');
 const cartRouter = require('./scripts/cartRouter');
 const apiRouter = require('./scripts/apiRouter');
 
 const app = express();
-
 
 app.use(express.json());
 app.use('/avatars', express.static('./database/avatars/'));

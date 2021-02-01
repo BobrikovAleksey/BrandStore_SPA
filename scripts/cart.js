@@ -1,9 +1,9 @@
 /**
- * Сравнивает два элемента корзины по артикулу и размеру
+ * Сравнивает два элемента корзины по id и размеру
  *
- * @param dataA - объект со структурой { id, data: { size } }
- * @param dataB - объект со структурой { id, data: { size } }
- * @returns {boolean|boolean}
+ * @param dataA {{ id: number, data: { size: number|string }}}
+ * @param dataB {{ id: number, data: { size: number|string }}}
+ * @returns {boolean}
  */
 const compare = (dataA, dataB) => {
   return dataA.id === dataB.id && dataA.data.size === dataB.data.size
@@ -13,12 +13,20 @@ const compare = (dataA, dataB) => {
 /**
  * Добавляет новый товар в корзину
  *
- * @param list - список товаров в корзине
- * @param req - должен содержать body = { id, data: { size, quantity } }
- * @returns {string} - возвращает JSON-строку
+ * @param list {array} - список товаров в корзине
+ * @param product {{id: number, data: { size: number|string, quantity: number }}}
+ * @returns {string}
  */
-const add = (list, req) => {
-  list.push(req.body);
+const add = (list, product) => {
+  if (!Array.isArray(list)) return '[]';
+
+  const i = list.findIndex((el) => compare(el, product));
+
+  if (i < 0) {
+    list.push(product);
+  } else {
+    list[i].data.quantity += product.data.quantity;
+  }
 
   return JSON.stringify(list, null, 2);
 };
@@ -27,14 +35,20 @@ const add = (list, req) => {
 /**
  * Добавляет определенное количество уже находящегося в корзине товара
  *
- * @param list - список товаров в корзине
- * @param req - должен содержать body = { id, data: { size, quantity } }
- * @returns {string} - возвращает JSON-строку
+ * @param list {array} - список товаров в корзине
+ * @param product {{id: number, data: { size: number|string, quantity: number }}}
+ * @returns {string}
  */
-const change = (list, req) => {
-  const el = list.find((el) => compare(el, req.body));
+const change = (list, product) => {
+  if (!Array.isArray(list)) return '[]';
 
-  el.data.quantity += req.body.data.quantity;
+  const i = list.findIndex((el) => compare(el, product));
+
+  if (i >= 0) {
+    list[i].data.quantity += product.data.quantity;
+  } else {
+    list.push(product);
+  }
 
   return JSON.stringify(list, null, 2);
 };
@@ -44,16 +58,18 @@ const change = (list, req) => {
  * Убирает определенное количество находящегося в корзине товара, если после изменения количество товара становится
  * отрицательным, он удаляется из корзины
  *
- * @param list - список товаров в корзине
- * @param req - должен содержать body = { id, data: { size, quantity } }
- * @returns {string} - возвращает JSON-строку
+ * @param list {array} - список товаров в корзине
+ * @param product {{id: number, data: { size: number|string, quantity: number }}}
+ * @returns {string}
  */
-const del = (list, req) => {
-  const i = list.findIndex((el) => compare(el, req.body));
+const del = (list, product) => {
+  if (!Array.isArray(list)) return '[]';
 
-  list[i].data.quantity -= req.body.data.quantity;
-  if (list[i].data.quantity < 0) {
-    list.splice(i, 1);
+  const i = list.findIndex((el) => compare(el, product));
+
+  if (i >= 0) {
+    list[i].data.quantity -= product.data.quantity;
+    if (list[i].data.quantity < 0) list.splice(i, 1);
   }
 
   return JSON.stringify(list, null, 2);
@@ -63,7 +79,7 @@ const del = (list, req) => {
 /**
  * Полностью очищает корзину
  *
- * @returns {string} - возвращает JSON-строку
+ * @returns {string}
  */
 const clear = () => {
   return JSON.stringify([], null, 2);

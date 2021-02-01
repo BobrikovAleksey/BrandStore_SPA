@@ -1,69 +1,77 @@
-const fs = require('fs');
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
+const lib = require('./library');
+const db = require('./database');
 const handler = require('./handler');
-const catalogUrl = './database/catalog.json';
+
 const cartUrl = './database/cart-user.json';
+
+const ADD = 'cart.add';
+const CHANGE = 'cart.change';
+const DELETE = 'cart.delete';
+const CLEAR = 'cart.clear';
 
 
 /**
- * Считывает данные из корзины и возвращает их
+ * Возвращает товары из корзины
  */
-router.get('/', (req, res) => {
-  fs.readFile(cartUrl, 'utf-8', (err, cart) => {
-      if (err) res.sendStatus(404, JSON.stringify({ result: 0, text: err }));
+router.get('/', (request, response) => {
+  if (!db.catalog) {
+    response.sendStatus(404).send('{"result": -1, "message": "Try again request later"}');
+    return;
+  }
 
-      else {
-        fs.readFile(catalogUrl, 'utf-8', (err, catalog) => {
-          if (err) res.sendStatus(404, JSON.stringify({result: 0, text: err}));
+  if (db.catalog.result === 0) {
+    response.sendStatus(404).send(JSON.stringify(db.catalog));
+    return;
+  }
 
-          else {
-            const data = [];
+  fs.readFile(cartUrl, 'utf-8', (err, data) => {
+    if (err) {
+      response.sendStatus(404).send(JSON.stringify({ result: 0, message: err }));
+      return;
+    }
 
-            catalog = JSON.parse(catalog);
-            cart = JSON.parse(cart);
-            for (let i = 0; i < cart.length; i++) {
-              const product = catalog.find((el) => el.id === cart[i].id);
+    const cart = lib.jsonParse(data) ?? [];
+    for (let i = 0; i < cart.length; i++) {
+      cart[i].product = db.catalog.data[String(cart[i].id)];
+    }
 
-              if (product) data.push(Object.assign(cart[i], product));
-            }
-            res.send(JSON.stringify(data));
-          }
-        });
-      }
+    response.send(JSON.stringify(cart));
   });
 });
 
 
 /**
- * Передает управление handler-у с действием 'add' - добавляет новый товар в корзину
+ * Добавляет новый товар в корзину
  */
-router.post('/', (req, res) => {
-  handler(req, res, 'add', cartUrl);
+router.post('/', (request, response) => {
+  handler(request, response, ADD, cartUrl);
 });
 
 
 /**
- * Передает управление handler-у с действием 'change' - добавляет товар в корзину
+ * Добавляет товар в корзину
  */
-router.put('/', (req, res) => {
-  handler(req, res, 'change', cartUrl);
+router.put('/', (request, response) => {
+  handler(request, response, CHANGE, cartUrl);
 });
 
 
 /**
- * Передает управление handler-у с действием 'del' - убирает товар из корзины
+ * Убирает товар из корзины
  */
-router.delete('/', (req, res) => {
-  handler(req, res, 'del', cartUrl);
+router.delete('/', (request, response) => {
+  handler(request, response, DELETE, cartUrl);
 });
 
 
 /**
- * Передает управление handler-у с действием 'clear' - очищает корзину
+ * Очищает корзину
  */
-router.delete('/clr', (req, res) => {
-  handler(req, res, 'clear', cartUrl);
+router.delete('/clear', (request, response) => {
+  handler(request, response, CLEAR, cartUrl);
 });
 
 

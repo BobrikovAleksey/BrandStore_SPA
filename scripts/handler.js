@@ -1,28 +1,44 @@
 const fs = require('fs');
+const lib = require('./library');
 const cart = require('./cart');
 
 
-const cartActions = {
-  add: cart.add,
-  change: cart.change,
-  del: cart.del,
-  clear: cart.clear,
+const actions = {
+  'cart.add': cart.add,
+  'cart.change': cart.change,
+  'cart.delete': cart.del,
+  'cart.clear': cart.clear,
 };
 
 
-const handler = (req, res, action, file) => {
-  fs.readFile(file, 'utf-8', (err, data) => {
-    if (err) res.sendStatus(404, JSON.stringify({result: 0, text: err}));
+/**
+ * Добавляет, изменяет и удаляет записи в файле
+ *
+ * @param request {Request}
+ * @param response {Response}
+ * @param action {string}
+ * @param filepath {string}
+ */
+const handler = (request, response, action, filepath) => {
+  if (!actions[action]) {
+    response.sendStatus(404).send(JSON.stringify({
+      result: 0,
+      message: `Handler [${action}]: There is not such action`,
+    }));
+    return;
+  }
 
-    else {
-      const newCart = cartActions[action](JSON.parse(data), req);
-
-      fs.writeFile(file, newCart, (err) => {
-        if (err) res.send('{"result": 0}');
-
-        else res.send('{"result": 1}');
-      });
+  fs.readFile(filepath, 'utf-8', (err, data) => {
+    if (err) {
+      response.sendStatus(404).send(JSON.stringify({result: 0, message: err}));
+      return;
     }
+
+    fs.writeFile(filepath, actions[action](lib.jsonParse(data), request), (err) => {
+        if (err) response.send(`{"result": 0, "message": ${err}}`);
+
+        else response.send(`{"result": 1, "message": "Handler [${action}]: File was updated"}`);
+      });
   });
 };
 
