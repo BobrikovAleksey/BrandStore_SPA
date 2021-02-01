@@ -1,79 +1,31 @@
-# GB_serverForBrand
+# Интернет магазин одежды и аксессуаров "Brand"
+Тестовый сервер для магазина одежды и аксессуаров "Brand"
 
-Сервер для интернет-магазина Brand
+## Установка проекта:
+yarn install | npm install
 
-# Установка проекта:
+## Запуск сервера:
+yarn serve | npm run serve
 
-yarn install
-
-# Запуск сервера:
-
-yarn serve | node serve[/index]
-
-# URL:
-
-http://localhost:3030
-
-# Каталог:
-
-http://localhost:3030/api/catalog
-
-можно использовать запросы:
-
-    /?page="men" | "women" | "kids" | "accessories" => выборка по одному из указанных значений
-    /?categories=["значение"[, ...]] => выборка товаров, у которых совпадает любая из категорий
-    /?brands=["значение"[, ...]] => выборка товаров, у которых совпадает любой из брендов
-    /?colors=["значение"[, ...]] => выборка товаров, у которых совпадается любой из цветов
-    /?filter={"[поле]":"значение"[, ...]} => фильтрация по значению в выбранном поле
-    /?sortBy={"поле":"asc|desc"[, ...]} => сортировка по указанному полю
-    /?quantity=[число] => ограничение количество получаемых товаров
-
-# Категории:
-
-http://localhost:3030/api/catalog/categories
-
-можно использовать запрос:
-
-    /?page="men" | "women" | "kids" | "accessories" => выборка по одному из указанных значений
-
-# Бренды:
-
-http://localhost:3030/api/catalog/brands
-
-можно использовать запрос:
-
-    /?page="men" | "women" | "kids" | "accessories" => выборка по одному из указанных значений
-
-# Цвета:
-
-http://localhost:3030/api/catalog/colors
-
-можно использовать запрос:
-
-    /?page="men" | "women" | "kids" | "accessories" => выборка по одному из указанных значений
-
-# Товар из каталога по артикулу:
-
-http://localhost:3030/api/product/
-
-обязательно должен передаваться артикул товара:
-
-    /?id=[артикул] => возвращает список товаров: 0 - это выбранный товар, 1...n - зависимые по цветам
-
-# Корзина:
-
-http://localhost:3030/api/cart
-
-# Списки:
-
-Отзывы:
-
-http://localhost:3030/api/review
-
-Регионы:
-
-http://localhost:3030/api/lists/regions
-
-Города:
-
-http://localhost:3030/api/lists/cities
+## API
+1. [Каталог](http://localhost:3030/api/catalog): http://localhost:3030/api/catalog
+    - [каталог женский|мужской|детский|аксессуары](http://localhost:3030/api/catalog/?page=women): http://localhost:3030/api/catalog/?page=men|women|kids|accessories
+    - [коллекции](http://localhost:3030/api/catalog/?collection=женская%20коллекция): http://localhost:3030/api/catalog/?collection=название_коллекции"
+    - [каталог по категории](http://localhost:3030/api/catalog/?categories=["одежда|блузки%20и%20рубашки"]): http://localhost:3030/api/catalog/?categories=["type|category",[...]]
+    - [каталог по бренду](http://localhost:3030/api/catalog/?brands=["mango"]): http://localhost:3030/api/catalog/?brands=["название_бренда",[...]]
+    - [каталог по цвету](http://localhost:3030/api/catalog/?colors=["white","черный"]): http://localhost:3030/api/catalog/?colors=["цвет",[...]]
+    - [поиск по каталогу](http://localhost:3030/api/catalog/?filter=["брюки","white","лен"]): http://localhost:3030/api/catalog/?filter=["любое_слово_более_двух_букв",[...]]
+    - [сортировка каталога](http://localhost:3030/api/catalog/?sortBy={"rating":"desc","price":"asc"}): http://localhost:3030/api/catalog/?sortBy={"поле":"способ_сортировки",[...]}
+2. [Категории](http://localhost:3030/api/catalog/categories/): http://localhost:3030/api/catalog/categories/
+3. [Бренды](http://localhost:3030/api/catalog/brands/): http://localhost:3030/api/catalog/brands/
+4. [Палитра цветов](http://localhost:3030/api/catalog/colors/): http://localhost:3030/api/catalog/colors/
+5. [Отзывы](http://localhost:3030/api/reviews/): http://localhost:3030/api/reviews/
+6. Списки:
+    - [города](http://localhost:3030/api/lists/cities/): http://localhost:3030/api/lists/cities/
+    - [регионы](http://localhost:3030/api/lists/regions/): http://localhost:3030/api/lists/regions/
+7. Корзина:
+    - [список товаров](http://localhost:3030/api/cart/): http://localhost:3030/api/cart/
+    - добавить товар: http://localhost:3030/api/cart/ (post)
+    - увеличить количество товара: http://localhost:3030/api/cart/ (put)
+    - убрать/уменьшить количество товара: http://localhost:3030/api/cart/ (delete)
+    - очистить: http://localhost:3030/api/cart/clear/ (delete)
